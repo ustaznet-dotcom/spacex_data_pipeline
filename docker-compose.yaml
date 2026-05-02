@@ -94,8 +94,12 @@ services:
       superset-init:
         condition: service_completed_successfully
     environment:
-      - DATABASE_URL=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/superset_metadata
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - SUPERSET_SECRET_KEY=superset_secret
+      - SUPERSET_CONFIG_PATH=/app/pythonpath/superset_config.py
+    volumes:
+      - ./config:/app/pythonpath
     networks:
       - spacex_net
 
@@ -108,8 +112,12 @@ services:
       clickhouse:
         condition: service_started
     environment:
-      - DATABASE_URL=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/superset_metadata
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - SUPERSET_SECRET_KEY=superset_secret
+      - SUPERSET_CONFIG_PATH=/app/pythonpath/superset_config.py
+    volumes:
+      - ./config:/app/pythonpath
     command: >
       bash -c  "superset db upgrade &&
        superset fab create-admin --username admin --firstname Admin --lastname Admin --email admin@superset.com --password admin &&
