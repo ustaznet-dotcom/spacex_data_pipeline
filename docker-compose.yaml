@@ -47,6 +47,7 @@ services:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
+      - ./dbt:/opt/airflow/dbt
     command: webserver
     networks:
       - spacex_net
@@ -62,6 +63,7 @@ services:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
+      - ./dbt:/opt/airflow/dbt
     environment:
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/airflow_metadata
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
@@ -89,6 +91,18 @@ services:
     ports:
       - "8088:8088"
     depends_on:
+      superset-init:
+        condition: service_completed_successfully
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/superset_metadata
+      - SUPERSET_SECRET_KEY=superset_secret
+    networks:
+      - spacex_net
+
+  superset-init:
+    image: apache/superset:3.1.0
+    container_name: superset_int
+    depends_on:
       postgres:
         condition: service_healthy
       clickhouse:
@@ -96,6 +110,10 @@ services:
     environment:
       - DATABASE_URL=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/superset_metadata
       - SUPERSET_SECRET_KEY=superset_secret
+    command: >
+      bash -c  "superset db upgrade &&
+       superset fab create-admin --username admin --firstname Admin --lastname Admin --email admin@superset.com --password admin &&
+       superset init"
     networks:
       - spacex_net
 
