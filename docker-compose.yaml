@@ -15,6 +15,7 @@ services:
     - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     networks:
       - spacex_net
 
@@ -25,7 +26,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://admin:admin@postgres/airflow_metadata
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/airflow_metadata
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
     command: bash -c "airflow db init && airflow users create --username admin --password admin --firstname Air --lastname Flow --role Admin --email admin@example.com"
     networks:
@@ -38,7 +39,7 @@ services:
       airflow-init:
         condition: service_completed_successfully
     environment:
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://admin:admin@postgres/airflow_metadata
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/airflow_metadata
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
     ports:
       - "8080:8080"
@@ -62,7 +63,7 @@ services:
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
     environment:
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://admin:admin@postgres/airflow_metadata
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/airflow_metadata
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
     networks:
       - spacex_net
@@ -91,9 +92,9 @@ services:
       postgres:
         condition: service_healthy
       clickhouse:
-        condition: service_started   
+        condition: service_started
     environment:
-      - DATABASE_URL=postgresql+psycopg2://admin:admin@postgres/superset_metadata
+      - DATABASE_URL=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/superset_metadata
       - SUPERSET_SECRET_KEY=superset_secret
     networks:
       - spacex_net
