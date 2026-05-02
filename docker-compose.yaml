@@ -69,7 +69,7 @@ services:
 
   clickhouse:
     image: clickhouse/clickhouse-server:24.3
-    container_name: click_con
+    container_name: click_cont
     ports:
       - "8123:8123"
       - "9000:9000"
@@ -81,6 +81,24 @@ services:
       nofile:
         soft: 262144
         hard: 262144
+
+  superset:
+    image: apache/superset:3.1.0
+    container_name: superset_cont
+    ports:
+      - "8088:8088"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clickhouse:
+        condition: service_started   
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://admin:admin@postgres/superset_metadata
+      - SUPERSET_SECRET_KEY=superset_secret
+    networks:
+      - spacex_net
+
+
 
 networks:
   spacex_net:
