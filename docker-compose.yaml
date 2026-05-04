@@ -20,7 +20,7 @@ services:
       - spacex_net
 
   airflow-init:
-    image: apache/airflow:2.9.1
+    build: .
     container_name: airflow_cont
     depends_on:
       postgres:
@@ -33,7 +33,7 @@ services:
       - spacex_net
 
   airflow-webserver:
-    image: apache/airflow:2.9.1
+    build: .
     container_name: airflow_web
     depends_on:
       airflow-init:
@@ -53,7 +53,7 @@ services:
       - spacex_net
 
   airflow-scheduler:
-    image: apache/airflow:2.9.1
+    build: .
     container_name: airflow_sched
     depends_on:
       airflow-init:
