@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: bronze
+    database: spacex_raw
+    schema: bronze
+    tables:
+      - name: launches
+        description: "Raw SpaceX launches loaded by Airflow"
+        columns:
+          - name: id
+            description: "Unique launch identifier from SpaceX API"
+          - name: payload
+            description: "Full launch JSON from API"
+          - name: loaded_at
+            description: "Timestamp when row was loaded"
