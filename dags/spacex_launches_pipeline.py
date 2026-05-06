@@ -5,6 +5,7 @@ from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 import requests
 import json
+from airflow.operators.bash import BashOperator
 
 def fetch_launches_from_api(**context):
         response = requests.get('https://api.spacexdata.com/v4/launches')
@@ -33,11 +34,11 @@ def load_to_postgres(**context):
 
 
 with DAG(
-    dag_id='spacex_launches_bronze',
+    dag_id='spacex_launches_pipeline',
+    tags=['spacex', 'bronze', 'silver', 'dbt'],
     start_date=datetime(2026, 1, 1),
     schedule='0 6 * * *',
     catchup=False,
-    tags=['spacex', 'bronze']
 ) as dag:
 
     create_bronze_table = PostgresOperator(
@@ -62,5 +63,15 @@ with DAG(
         task_id='load_to_postgres',
         python_callable=load_to_postgres,
     )
+    dbt_run = BashOperator(
+          task_id='dbt_run',
+          bash_command='cd /opt/airflow/dbt/spacex_dbt && dbt run --profiles-dir .',
 
-    create_bronze_table >> fetch_launches >> load_data
+    )
+
+    dbt_test=BashOperator(
+          task_id='dbt_test',
+          bash_command='cd /opt/airflow/dbt/spacex_dbt && dbt test --profiles-dir .',
+    )
+
+    create_bronze_table >> fetch_launches >> load_data >> dbt_run >> dbt_test
