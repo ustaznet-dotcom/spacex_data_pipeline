@@ -10,7 +10,14 @@ sources:
         columns:
           - name: id
             description: "Unique launch identifier from SpaceX API"
+            tests:
+              - unique
+              - not_null
           - name: payload
             description: "Full launch JSON from API"
+            tests:
+              - not_null
           - name: loaded_at
             description: "Timestamp when row was loaded"
+            tests:
+              - not_null

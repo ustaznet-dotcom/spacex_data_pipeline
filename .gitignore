@@ -230,3 +230,7 @@ __pycache__/
 # OS
 .DS_Store
 Thumbs.db
+# dbt
+dbt/spacex_dbt/target/
+dbt/spacex_dbt/dbt_packages/
+dbt/spacex_dbt/logs/

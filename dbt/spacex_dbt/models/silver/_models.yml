@@ -1,0 +1,27 @@
+version: 2
+
+models:
+  - name: launches
+    description: "Cleaned and typed SpaceX launches data"
+    columns:
+      - name: launch_id
+        description: "Unique identifier for each launch"
+        tests:
+          - unique
+          - not_null
+      - name: mission_name
+        description: "Name of the mission"
+        tests:
+          - not_null
+      - name: flight_number
+        description: "Sequential flight number"
+        tests:
+          - not_null
+      - name: launch_date_utc
+        description: "Launch date and time in UTC"
+        tests:
+          - not_null
+      - name: rocket_id
+        description: "Foreign key to rocket"
+        tests:
+          - not_null
