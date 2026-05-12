@@ -35,7 +35,7 @@ def load_to_postgres(**context):
 
 with DAG(
     dag_id='spacex_launches_pipeline',
-    tags=['spacex', 'bronze', 'silver', 'dbt'],
+    tags=['spacex', 'bronze', 'silver', 'dbt', 'clickhouse', 'gold'],
     start_date=datetime(2026, 1, 1),
     schedule='0 6 * * *',
     catchup=False,
@@ -63,9 +63,9 @@ with DAG(
         task_id='load_to_postgres',
         python_callable=load_to_postgres,
     )
-    dbt_run = BashOperator(
-          task_id='dbt_run',
-          bash_command='cd /opt/airflow/dbt/spacex_dbt && dbt run --profiles-dir .',
+    dbt_run_silver = BashOperator(
+          task_id='dbt_run_silver',
+          bash_command='cd /opt/airflow/dbt/spacex_dbt && dbt run --select silver.* --target dev --profiles-dir .',
 
     )
 
@@ -74,4 +74,9 @@ with DAG(
           bash_command='cd /opt/airflow/dbt/spacex_dbt && dbt test --profiles-dir .',
     )
 
-    create_bronze_table >> fetch_launches >> load_data >> dbt_run >> dbt_test
+    dbt_run_gold=BashOperator(
+          task_id='dbt_run_gold',
+            bash_command='cd /opt/airflow/dbt/spacex_dbt && dbt run --select gold.* --target clickhouse --profiles-dir .',
+    )
+
+    create_bronze_table >> fetch_launches >> load_data >> dbt_run_silver >> dbt_test >> dbt_run_gold
