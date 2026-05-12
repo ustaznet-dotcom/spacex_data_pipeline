@@ -10,3 +10,12 @@ spacex_dbt:
       dbname: spacex_raw
       schema: silver
       threads: 4
+    clickhouse:
+      type: clickhouse
+      host: clickhouse
+      port: 9000
+      user: dbt
+      password: 'dbt_password'
+      schema: gold
+      secure: False
+      threads: 4
