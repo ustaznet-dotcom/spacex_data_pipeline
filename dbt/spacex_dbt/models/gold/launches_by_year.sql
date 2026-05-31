@@ -13,7 +13,7 @@ SELECT
 FROM postgresql(
     'postgres:5432',
     'spacex_raw',
-    'launches',
+    'launches_enriched',
     'admin',
     'admin',
     'silver'

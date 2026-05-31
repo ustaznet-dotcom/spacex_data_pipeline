@@ -1,5 +1,3 @@
-version: 2
-
 sources:
   - name: bronze
     database: spacex_raw
@@ -9,15 +7,24 @@ sources:
         description: "Raw SpaceX launches loaded by Airflow"
         columns:
           - name: id
-            description: "Unique launch identifier from SpaceX API"
-            tests:
-              - unique
-              - not_null
+            tests: [unique, not_null]
           - name: payload
-            description: "Full launch JSON from API"
-            tests:
-              - not_null
+            tests: [not_null]
           - name: loaded_at
-            description: "Timestamp when row was loaded"
-            tests:
-              - not_null
+            tests: [not_null]
+
+      - name: rockets                               
+        description: "Raw SpaceX rockets metadata"
+        columns:
+          - name: id
+            tests: [unique, not_null]
+          - name: payload
+            tests: [not_null]
+
+      - name: launchpads
+        description: "Raw SpaceX launchpads metadata"
+        columns:
+          - name: id
+            tests: [unique, not_null]
+          - name: payload
+            tests: [not_null]

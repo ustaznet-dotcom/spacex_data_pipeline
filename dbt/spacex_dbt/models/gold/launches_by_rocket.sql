@@ -5,21 +5,22 @@
 ) }}
 
 SELECT
-    assumeNotNull(rocket_id) as rocket_id,
-    count() as total_launches,
-    countIf(is_success = true) as successful_launches,
+    assumeNotNull(rocket_id) AS rocket_id,
+    assumeNotNull(rocket_name) AS rocket_name,
+    count() AS total_launches,
+    countIf(is_success = true) AS successful_launches,
     countIf(is_success = false) AS failed_launches,
-    round(countIf(is_success = true) / count() * 100, 2) as success_rate_pct,
-    min(launch_date_utc) as first_launch_date,
-    max(launch_date_utc) as last_launch_date
+    round(countIf(is_success = true) / count() * 100, 2) AS success_rate_pct,
+    min(launch_date_utc) AS first_launch_date,
+    max(launch_date_utc) AS last_launch_date
 FROM postgresql(
     'postgres:5432',
     'spacex_raw',
-    'launches',
+    'launches_enriched',
     'admin',
     'admin',
     'silver'
 )
 WHERE is_upcoming = false
-GROUP BY rocket_id
+GROUP BY rocket_id, rocket_name
 ORDER BY rocket_id
